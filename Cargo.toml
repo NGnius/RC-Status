@@ -1,0 +1,15 @@
+[package]
+name = "rc-status"
+version = "0.1.0"
+authors = ["NGnius (Graham) <ngniusness@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rocket = "0.4.7"
+rocket_contrib = {version = "0.4.7", features = ["handlebars_templates"]}
+lazy_static = "1.4.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0" }
+reqwest = { version = "0.11.1", features = ["json", "blocking"]}
