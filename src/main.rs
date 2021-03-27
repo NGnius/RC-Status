@@ -18,6 +18,7 @@ fn main() {
     workers.start();
     println!("Hello, world!");
     rocket::ignite().mount("/", routes![root::index])
+        .mount("/static", rocket_contrib::serve::StaticFiles::from("./static"))
         .attach(rocket_contrib::templates::Template::fairing())
         .launch();
     *IS_STOPPING.write().unwrap() = true;

@@ -1,7 +1,7 @@
 #![allow(non_snake_case)]
 use serde::{Deserialize, Serialize};
 use std::thread::{spawn, sleep, JoinHandle};
-use reqwest::blocking::Client;
+use reqwest::blocking::ClientBuilder;
 
 static URL: &str = "http://robocraftstaticdata.s3.amazonaws.com/live/data.json";
 
@@ -193,7 +193,10 @@ pub fn start_worker() -> JoinHandle<()> {
 
 fn staticdata_worker() {
     let sleep_dur = std::time::Duration::from_secs(30);
-    let http_client = Client::new();
+    let http_client = ClientBuilder::new()
+        .connect_timeout(sleep_dur)
+        .timeout(sleep_dur)
+        .build().expect("Failed to build static data worker HTTP client");
     while ! *crate::IS_STOPPING.read().unwrap() {
         // do work
         let result = http_client.get(URL).send();

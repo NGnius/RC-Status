@@ -2,14 +2,16 @@
 <html lang="en">
 <head>
     <title>RoboStatus</title>
+    <link rel="shortcut icon" href="/static/favicon.png">
+    <link rel="icon" href="/static/favicon.png">
 </head>
 <body>
 <div align="center">
     <h1>Robocraft Server Status</h1>
-    <p>An unofficial status detector for Robocraft servers</p>
+    <p>Unofficial status detector for Robocraft servers</p>
     {{#if staticdata_ok}}
         {{#if staticdata.MaintenanceMode}}
-            <h2>Robocraft is in maintenace: {{staticdata.MaintenanceMessage}}</h2>
+            <h2>Robocraft is in maintenance: {{staticdata.MaintenanceMessage}}</h2>
         {{/if}}
         {{#if staticdata.DevMessage}}
             <h2>Message from Freejam: {{staticdata.DevMessage}}</h2>
@@ -19,12 +21,17 @@
     {{#if staticdata_ok}}
         <div align="left">
             <p>Minimum Version: {{staticdata.MinimumVersion}}</p>
-            <p>Maintenace Mode? {{staticdata.MaintenanceMode}}</p>
+            <p>Maintenance Mode? {{staticdata.MaintenanceMode}}</p>
             <p>EAC Enabled? {{staticdata.EacEnabled}}</p>
             <p>XSolla Enabled? {{staticdata.xsollaEnabled}}</p>
             <p>Packet size (max): {{staticdata.PacketSize}} ({{staticdata.MaxPacketSize}})</p>
         </div>
     {{/if}}
+    {{#unless staticdata_ok}}
+        <div align="left">
+            <p>Static data server is down :(</p>
+        </div>
+    {{/unless}}
 </div>
 <footer>
     <div align="center">
