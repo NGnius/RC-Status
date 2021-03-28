@@ -7,16 +7,19 @@ mod root;
 mod context;
 mod work;
 mod staticdata;
+mod persist;
+mod configuration;
+mod maintenance;
 
 lazy_static! {
     pub static ref CONTEXT: RwLock<context::IndexContext> = RwLock::new(context::IndexContext::new());
     pub static ref IS_STOPPING: RwLock<bool> = RwLock::new(false);
+    pub static ref CONFIG: RwLock<configuration::Config> = RwLock::new(configuration::Config::new());
 }
 
 fn main() {
     let mut workers = work::Workers::new();
     workers.start();
-    println!("Hello, world!");
     rocket::ignite().mount("/", routes![root::index])
         .mount("/static", rocket_contrib::serve::StaticFiles::from("./static"))
         .attach(rocket_contrib::templates::Template::fairing())

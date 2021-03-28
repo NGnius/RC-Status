@@ -4,8 +4,17 @@
     <title>RoboStatus</title>
     <link rel="shortcut icon" href="/static/favicon.png">
     <link rel="icon" href="/static/favicon.png">
+    <script type="application/javascript">
+        function populateTimes() {
+            var times = document.getElementsByTagName("time");
+            for (i = 0; i < times.length; i++) {
+                var date = new Date(Number(times[i].attributes["datetime"].value)*1000)
+                times[i].innerText = date.toDateString() + " " + date.toTimeString().split(" ")[0].substring(0, 5) + " (UTC)";
+            }
+        }
+    </script>
 </head>
-<body>
+<body onload="populateTimes()">
 <div align="center">
     <h1>Robocraft Server Status</h1>
     <p>Unofficial status detector for Robocraft servers</p>
@@ -32,6 +41,25 @@
             <p>Static data server is down :(</p>
         </div>
     {{/unless}}
+    <div>
+        <h2>Incidents</h2>
+        {{#each data.incidents}}
+            <div>
+                <time datetime="{{time}}" onload="populateTime(event)" onclick="populateTime(event)"></time>
+                {{#if resolved}}
+                    to <time datetime="{{resolved}}" onload="populateTime(event)"></time>
+                {{/if}}
+                {{#if message}} {{!-- Maintenance incident --}}
+                    <h3>Maintenance</h3>
+                    <p>{{message}}</p>
+                {{/if}}
+                {{#unless message}}
+                    <h3>{{title}}</h3>
+                    <p>{{description}}</p>
+                {{/unless}}
+            </div>
+        {{/each}}
+    </div>
 </div>
 <footer>
     <div align="center">

@@ -10,7 +10,10 @@ impl Workers {
     }
 
     pub fn start(&mut self) {
+        self.handles.push(crate::configuration::start_worker());
+        self.handles.push(crate::persist::start_worker());
         self.handles.push(crate::staticdata::start_worker());
+        self.handles.push(crate::maintenance::start_worker());
     }
 
     pub fn stop(self) {

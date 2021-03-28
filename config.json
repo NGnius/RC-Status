@@ -1,0 +1,6 @@
+{
+  "max_incidents": 32,
+  "max_datapoints": 10000,
+  "password": "password",
+  "period_ms": 30000
+}

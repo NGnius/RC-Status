@@ -98,46 +98,46 @@ impl StaticDataRaw {
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct StaticData {
-    MaintenanceMode: bool, // bool as string
-    MaintenanceRegex: String, // ???
-    EacEnabled: bool, // bool as string
-    MinimumVersion: usize, // integer as string
-    PhotonSocialServer: String, // url
-    PhotonServicesServer: String, // url
-    PhotonChatServer: String, // url
-    PhotonSinglePlayerServer: String, // url
-    GameplayServerServiceAddress: String, // url
-    PhotonLobbyServer: String, // url
-    ErrorLogAddress: String, // url
-    ServerErrorLogAddress: String, // url
-    authUrl: String, // url
-    paymentUrl: String, // url
-    enterBattleLogGenerationTimeout: usize, // int as string
-    GameServerConnectionTestTimeout: usize,
-    AvatarCdnUrl: String, // url
-    ClanAvatarCdnUrl: String, // url
-    FeatureThrottlerOnPercent: usize, // int as string
-    EmailCaptureEnabled: String, // bool as string
-    UnreliableMessages: String, // bool as string
-    MessageQueueEnabled: String, // bool as string
-    BrawlDataUrl: String, // url
-    CampaignDataUrl: String, // url
-    LeaderboardsUrl: String, // url
-    NetworkChannelTypes: usize, // int as string
-    MaxSentMessageQueueSize: usize,
-    IsAcksLong: bool, // bool as int (1 === True)
-    NetworkDropThreshold: usize,
-    PacketSize: usize,
-    MaxPacketSize: usize,
-    MaxCombinedReliableMessageCount: usize,
-    MaxCombinedReliableMessageSize: usize,
-    SaveRequestOnPhoton: bool, // bool as string
-    UseS3System: bool, // bool as string
-    authMigrationUrl: String, // url
-    xsollaEnabled: bool, // bool as string
-    MaintenanceMessage: String,
-    DevMessage: String,
-    DevMessageDisplayTime: usize, // int as string
+    pub MaintenanceMode: bool, // bool as string
+    pub MaintenanceRegex: String, // ???
+    pub EacEnabled: bool, // bool as string
+    pub MinimumVersion: usize, // integer as string
+    pub PhotonSocialServer: String, // url
+    pub PhotonServicesServer: String, // url
+    pub PhotonChatServer: String, // url
+    pub PhotonSinglePlayerServer: String, // url
+    pub GameplayServerServiceAddress: String, // url
+    pub PhotonLobbyServer: String, // url
+    pub ErrorLogAddress: String, // url
+    pub ServerErrorLogAddress: String, // url
+    pub authUrl: String, // url
+    pub paymentUrl: String, // url
+    pub enterBattleLogGenerationTimeout: usize, // int as string
+    pub GameServerConnectionTestTimeout: usize,
+    pub AvatarCdnUrl: String, // url
+    pub ClanAvatarCdnUrl: String, // url
+    pub FeatureThrottlerOnPercent: usize, // int as string
+    pub EmailCaptureEnabled: String, // bool as string
+    pub UnreliableMessages: String, // bool as string
+    pub MessageQueueEnabled: String, // bool as string
+    pub BrawlDataUrl: String, // url
+    pub CampaignDataUrl: String, // url
+    pub LeaderboardsUrl: String, // url
+    pub NetworkChannelTypes: usize, // int as string
+    pub MaxSentMessageQueueSize: usize,
+    pub IsAcksLong: bool, // bool as int (1 === True)
+    pub NetworkDropThreshold: usize,
+    pub PacketSize: usize,
+    pub MaxPacketSize: usize,
+    pub MaxCombinedReliableMessageCount: usize,
+    pub MaxCombinedReliableMessageSize: usize,
+    pub SaveRequestOnPhoton: bool, // bool as string
+    pub UseS3System: bool, // bool as string
+    pub authMigrationUrl: String, // url
+    pub xsollaEnabled: bool, // bool as string
+    pub MaintenanceMessage: String,
+    pub DevMessage: String,
+    pub DevMessageDisplayTime: usize, // int as string
 }
 
 impl StaticData {
@@ -192,7 +192,7 @@ pub fn start_worker() -> JoinHandle<()> {
 }
 
 fn staticdata_worker() {
-    let sleep_dur = std::time::Duration::from_secs(30);
+    let mut sleep_dur = std::time::Duration::from_millis(crate::CONFIG.read().unwrap().period_ms);
     let http_client = ClientBuilder::new()
         .connect_timeout(sleep_dur)
         .timeout(sleep_dur)
@@ -200,23 +200,29 @@ fn staticdata_worker() {
     while ! *crate::IS_STOPPING.read().unwrap() {
         // do work
         let result = http_client.get(URL).send();
-        { // scope context write lock
-            let mut ctx = crate::CONTEXT.write().unwrap();
-            if let Ok(resp) = result {
-                let data_res = resp.json::<StaticDataRaw>();
-                if let Ok(data) = data_res {
-                    ctx.staticdata_ok = true;
-                    ctx.staticdata = data.nice();
-                } else {
-                    ctx.staticdata_ok = false;
-                    println!("Json err: {}", data_res.err().unwrap());
-                }
+        if let Ok(resp) = result {
+            //let ctx_old = crate::CONTEXT.read().unwrap().clone();
+            let data_res = resp.json::<StaticDataRaw>();
+            if let Ok(data) = data_res {
+                // json is good
+                let nice_data = data.nice();
+                let mut ctx = crate::CONTEXT.write().unwrap();
+                ctx.staticdata_ok = true;
+                ctx.staticdata = nice_data;
             } else {
+                // json is bad
+                let mut ctx = crate::CONTEXT.write().unwrap();
                 ctx.staticdata_ok = false;
-                println!("HTTP error: {}", result.err().unwrap());
+                //println!("Json err: {}", data_res.err().unwrap());
             }
+        } else {
+            // bad server response
+            let mut ctx = crate::CONTEXT.write().unwrap();
+            ctx.staticdata_ok = false;
+            //println!("HTTP error: {}", result.err().unwrap());
         }
         // no API spam
+        sleep_dur = std::time::Duration::from_millis(crate::CONFIG.read().unwrap().period_ms);
         sleep(sleep_dur);
     }
 }

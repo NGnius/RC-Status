@@ -5,6 +5,8 @@ pub struct IndexContext {
     pub debug: String,
     pub staticdata: crate::staticdata::StaticData,
     pub staticdata_ok: bool,
+    pub data: crate::persist::PersistentData,
+    pub data_ok: bool,
 }
 
 impl IndexContext {
@@ -14,6 +16,8 @@ impl IndexContext {
             debug: "Hello World!".to_string(),
             staticdata: crate::staticdata::StaticData::new(),
             staticdata_ok: false,
+            data: crate::persist::PersistentData::new(),
+            data_ok: false,
         }
     }
 }
