@@ -17,7 +17,9 @@ fn ping_worker() {
         // run ping command to server
         let staticdata_ok= crate::CONTEXT.read().unwrap().staticdata_ok;
         if staticdata_ok {
-            let addr = crate::CONTEXT.read().unwrap().staticdata.GameplayServerServiceAddress.clone();
+            let full_addr = crate::CONTEXT.read().unwrap().staticdata.GameplayServerServiceAddress
+                .clone();
+            let addr = full_addr.split(":").collect::<Vec<&str>>()[0];
             // run ping command to get server ping time
             let cmd_result = Command::new("ping")
                 .args(&["-q", "-c", "4", "-w", &PING_TIMEOUT_SECONDS.to_string(), &addr])
