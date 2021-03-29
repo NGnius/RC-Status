@@ -51,7 +51,7 @@ impl GraphDataPoint {
         if max < GRAPH_MINIMUM_VALUE { max = GRAPH_MAXIMUM_VALUE;}
         let mut min = dp.min;
         if min > GRAPH_MAXIMUM_VALUE { min = GRAPH_MAXIMUM_VALUE; }
-        if min < GRAPH_MAXIMUM_VALUE { min = GRAPH_MAXIMUM_VALUE;}
+        if min < GRAPH_MINIMUM_VALUE { min = GRAPH_MAXIMUM_VALUE;}
         let mut avg = dp.avg;
         if avg > GRAPH_MAXIMUM_VALUE { avg = GRAPH_MAXIMUM_VALUE; }
         if avg < GRAPH_MINIMUM_VALUE { avg = GRAPH_MAXIMUM_VALUE;}
