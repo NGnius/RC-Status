@@ -92,3 +92,41 @@
     text-align: left;
     padding: 4%;
 }
+.rcstatus-indicator {
+    display: inline-block;
+    margin: 0.5%;
+    width: clamp(10%, 20%, 90%);
+    vertical-align: middle;
+    padding: 0.5% 4%;
+}
+.rcstatus-indicator .rcstatus-indicator-tooltip {
+    visibility: hidden;
+    width: 100px;
+    background-color: #1f1f1f88;
+    text-align: center;
+    padding: 0.2%;
+    border-radius: 4px;
+    position: absolute;
+    z-index: 1;
+    vertical-align: middle;
+}
+.rcstatus-indicator:hover .rcstatus-indicator-tooltip {
+    visibility: visible;
+}
+
+.rcstatus-indicator-container {
+    margin: auto;
+    padding: 1%;
+    width: 80%;
+}
+.rcstatus-indicator-circle {
+    height: 25px;
+    width: 25px;
+    border-radius: 50%;
+    display: inline-block;
+    vertical-align: middle;
+}
+.rcstatus-indicator-text {
+    vertical-align: middle;
+    height: 100%;
+}

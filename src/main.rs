@@ -12,6 +12,13 @@ mod configuration;
 mod maintenance;
 mod ping;
 mod graphing;
+mod status;
+mod social_status;
+mod payment_status;
+mod leaderboard_status;
+mod logs_status;
+mod auth_status;
+mod cdn_status;
 
 lazy_static! {
     pub static ref CONTEXT: RwLock<context::IndexContext> = RwLock::new(context::IndexContext::new());

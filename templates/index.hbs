@@ -64,11 +64,11 @@
                             ticks: {
                                 suggestedMax: 100,
                                 suggestedMin: 0,
-                                beginAtZero: true,
+                                //beginAtZero: true,
                                 maxTicksLimit: 4,
                             }
                         }],
-                        xAxes: [{ticks:{maxTicksLimit:8},display:false}]
+                        xAxes: [{display:false}]
                     },
                     title:{text:'Server Latency (ms)',display:true},
                     legend:{display:false}
@@ -84,7 +84,15 @@
 <div class="rcstatus-main rcstatus-divider-t" align="center">
     <h1>Robocraft Server Status</h1>
     <div class="spaceless rcstatus-divider-t" style="width:80%;"></div>
-    <h3>Unofficial status detector for Robocraft servers</h3>
+    <h3 style="display:inline-block;">Unofficial status detector for Robocraft servers</h3>
+    {{! Main game service status }}
+    {{#if game_status.ok}}
+        <div class="rcstatus-indicator" style="background-color:{{game_status.bg_color}};">
+            <span class="rcstatus-indicator-circle" style="background-color: {{game_status.color}};"></span>
+            <span class="rcstatus-indicator-text">{{game_status.text}}</span>
+            <span class="rcstatus-indicator-tooltip">{{game_status.ping}} ms</span>
+        </div>
+    {{/if}}
     {{#if staticdata_ok}}
         {{#if staticdata.MaintenanceMode}}
             <h2>Robocraft is in maintenance: {{staticdata.MaintenanceMessage}}</h2>
@@ -99,9 +107,18 @@
     </div>
 
     {{! Service latency info //TODO}}
-    <div class="">
+    <div>
         <h2>Services</h2>
         <div class="spaceless rcstatus-divider-t" style="width:80%;"></div>
+        <div class="rcstatus-indicator-container">
+            {{#each indicators.services}}
+                <div class="rcstatus-indicator" style="background-color:{{bg_color}};">
+                    <span class="rcstatus-indicator-circle" style="background-color: {{color}};"></span>
+                    <span class="rcstatus-indicator-text">{{name}}</span>
+                    <span class="rcstatus-indicator-tooltip">{{ping}} ms</span>
+                </div>
+            {{/each}}
+        </div>
     </div>
 
     {{! Stuff for nerds }}
@@ -170,42 +187,6 @@
             <p>Developed by <a href="https://twitter.com/NGniusness">NGniusness</a></p>
         </div>
     </footer>
-</div>
-<div align="center" style="display:none;">
-    <h1>Robocraft Server Status</h1>
-    <p>Unofficial status detector for Robocraft servers</p>
-    {{#if staticdata_ok}}
-        {{#if staticdata.MaintenanceMode}}
-            <h2>Robocraft is in maintenance: {{staticdata.MaintenanceMessage}}</h2>
-        {{/if}}
-        {{#if staticdata.DevMessage}}
-            <h2>Message from Freejam: {{staticdata.DevMessage}}</h2>
-        {{/if}}
-    {{/if}}
-    {{! Ping latency graph }}
-    <div class="rcstatus-graph">
-        <canvas id="pingGraph" height="50px" class="rcstatus-graph"></canvas>
-    </div>
-    {{! Incidents }}
-    <div>
-        <h2>Incidents</h2>
-        {{#each data.incidents}}
-            <div>
-                <time datetime="{{time}}" onload="populateTime(event)" onclick="populateTime(event)"></time>
-                {{#if resolved}}
-                    to <time datetime="{{resolved}}" onload="populateTime(event)"></time>
-                {{/if}}
-                {{#if message}} {{!-- Maintenance incident --}}
-                    <h3>Maintenance</h3>
-                    <p>{{message}}</p>
-                {{/if}}
-                {{#unless message}}
-                    <h3>{{title}}</h3>
-                    <p>{{description}}</p>
-                {{/unless}}
-            </div>
-        {{/each}}
-    </div>
 </div>
 </body>
 </html>

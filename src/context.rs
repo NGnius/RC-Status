@@ -8,6 +8,8 @@ pub struct IndexContext {
     pub data: crate::persist::PersistentData,
     pub data_ok: bool,
     pub graph: crate::graphing::GraphData,
+    pub game_status: crate::status::ServiceStatus,
+    pub indicators: crate::status::ServiceData,
 }
 
 impl IndexContext {
@@ -20,6 +22,8 @@ impl IndexContext {
             data: crate::persist::PersistentData::new(),
             data_ok: false,
             graph: crate::graphing::GraphData::new(),
+            game_status: crate::status::ServiceStatus::new("Game Services".to_string()),
+            indicators: crate::status::ServiceData::new(),
         }
     }
 }

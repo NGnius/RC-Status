@@ -3,8 +3,8 @@ use std::thread::{spawn, sleep, JoinHandle};
 use chrono::prelude::{Utc, DateTime};
 use chrono::serde::ts_seconds;
 
-const GRAPH_MINIMUM_VALUE: f32 = 0.0; // ms
-const GRAPH_MAXIMUM_VALUE: f32 = 1000.0; // ms
+pub const GRAPH_MINIMUM_VALUE: f32 = 0.0; // ms
+pub const GRAPH_MAXIMUM_VALUE: f32 = 1000.0; // ms
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct GraphData {

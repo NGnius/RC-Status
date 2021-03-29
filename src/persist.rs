@@ -129,11 +129,12 @@ fn persistence_worker() {
             std::fs::File::create("data.json").expect("Failed to create data.json")
         );
         { // DATA read scope
-            serde_json::to_writer(writer, &crate::CONTEXT.write().unwrap().data)
+            serde_json::to_writer(writer, &crate::CONTEXT.read().unwrap().data.clone())
                 .expect("Failed to save data.json");
         }
         // no API spam
-        sleep(std::time::Duration::from_millis(crate::CONFIG.read().unwrap().period_ms));
+        let dur = crate::CONFIG.read().unwrap().period_ms;
+        sleep(std::time::Duration::from_millis(dur));
     }
 }
 

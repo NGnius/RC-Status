@@ -16,6 +16,12 @@ impl Workers {
         self.handles.push(crate::maintenance::start_worker());
         self.handles.push(crate::ping::start_worker());
         self.handles.push(crate::graphing::start_worker());
+        self.handles.push(crate::social_status::start_worker());
+        self.handles.push(crate::payment_status::start_worker());
+        self.handles.push(crate::leaderboard_status::start_worker());
+        self.handles.push(crate::auth_status::start_worker());
+        self.handles.push(crate::logs_status::start_worker());
+        self.handles.push(crate::cdn_status::start_worker());
     }
 
     pub fn stop(self) {
