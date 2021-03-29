@@ -76,8 +76,12 @@ fn graph_worker() {
         {
             let ctx = crate::CONTEXT.read().unwrap();
             if ctx.data.datapoints().len() != 0 {
-                let dp = &ctx.data.datapoints()[ctx.data.datapoints().len()-1];
-                if dp.time != ctx.graph.datapoints[ctx.graph.datapoints.len()-1].ref_time {
+                if ctx.graph.datapoints.len() != 0 {
+                    let dp = &ctx.data.datapoints()[ctx.data.datapoints().len()-1];
+                    if dp.time != ctx.graph.datapoints[ctx.graph.datapoints.len()-1].ref_time {
+                        update_required = true;
+                    }
+                } else {
                     update_required = true;
                 }
             }
