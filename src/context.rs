@@ -7,6 +7,7 @@ pub struct IndexContext {
     pub staticdata_ok: bool,
     pub data: crate::persist::PersistentData,
     pub data_ok: bool,
+    pub graph: crate::graphing::GraphData,
 }
 
 impl IndexContext {
@@ -18,6 +19,7 @@ impl IndexContext {
             staticdata_ok: false,
             data: crate::persist::PersistentData::new(),
             data_ok: false,
+            graph: crate::graphing::GraphData::new(),
         }
     }
 }

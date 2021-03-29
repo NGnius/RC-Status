@@ -4,6 +4,8 @@
     <title>RoboStatus</title>
     <link rel="shortcut icon" href="/static/favicon.png">
     <link rel="icon" href="/static/favicon.png">
+    {{! Scripts }}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js" integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw==" crossorigin="anonymous"></script>
     <script type="application/javascript">
         function populateTimes() {
             var times = document.getElementsByTagName("time");
@@ -12,10 +14,164 @@
                 times[i].innerText = date.toDateString() + " " + date.toTimeString().split(" ")[0].substring(0, 5) + " (UTC)";
             }
         }
+        function onLoadTasks(event) {
+            populateTimes();
+            buildPingGraph();
+        }
     </script>
+    <script type="application/javascript">
+        function timeString(time) {
+            var date = new Date(time*1000);
+            return date.toDateString() + " " + date.toTimeString().split(" ")[0].substring(0, 5) + "";
+        }
+        // automatically generated stuff
+        var labels = [{{#each graph.datapoints}}timeString({{ref_time}}),{{/each}}]
+        var averages = [{{#each graph.datapoints}}{x:new Date({{ref_time}}),y:{{avg}} },{{/each}}]
+        var maxs = [{{#each graph.datapoints}}{x:new Date({{ref_time}}),y:{{max}} },{{/each}}]
+        var mins = [{{#each graph.datapoints}}{x:new Date({{ref_time}}),y:{{min}} },{{/each}}]
+        // end automatically generated stuff
+        function buildPingGraph() {
+            var ctx = document.getElementById("pingGraph");
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Average',
+                        data: averages,
+                        backgroundColor: 'rgba(58, 139, 206, 0.5)',
+                        borderColor: 'rgba(58, 139, 206, 0.5)'
+                    },
+                    {
+                        label: 'Min',
+                        data: mins,
+                        fill: false,
+                        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                        borderColor: 'rgba(0, 0, 0, 0.4)'
+                    },
+                    {
+                        label: 'Max',
+                        data: maxs,
+                        fill: false,
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        borderColor: 'rgba(0, 0, 0, 0.8)'
+                    },
+                    ]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                suggestedMax: 100,
+                                suggestedMin: 0,
+                                beginAtZero: true,
+                                maxTicksLimit: 4,
+                            }
+                        }],
+                        xAxes: [{ticks:{maxTicksLimit:8},display:false}]
+                    },
+                    title:{text:'Server Latency (ms)',display:true},
+                    legend:{display:false}
+                    //tooltips: {enabled: false}
+                }
+            });
+        }
+    </script>
+    {{! Styles }}
+    <link rel="stylesheet" href="/static/rcstatus.css">
 </head>
-<body onload="populateTimes()">
-<div align="center">
+<body onload="onLoadTasks(event)" class="rcstatus-background">
+<div class="rcstatus-main rcstatus-divider-t" align="center">
+    <h1>Robocraft Server Status</h1>
+    <div class="spaceless rcstatus-divider-t" style="width:80%;"></div>
+    <h3>Unofficial status detector for Robocraft servers</h3>
+    {{#if staticdata_ok}}
+        {{#if staticdata.MaintenanceMode}}
+            <h2>Robocraft is in maintenance: {{staticdata.MaintenanceMessage}}</h2>
+        {{/if}}
+        {{#if staticdata.DevMessage}}
+            <h2>Message from Freejam: {{staticdata.DevMessage}}</h2>
+        {{/if}}
+    {{/if}}
+    {{! Ping latency graph }}
+    <div class="rcstatus-graph">
+        <canvas id="pingGraph" height="12px" width="90%"></canvas>
+    </div>
+
+    {{! Service latency info //TODO}}
+    <div class="">
+        <h2>Services</h2>
+        <div class="spaceless rcstatus-divider-t" style="width:80%;"></div>
+    </div>
+
+    {{! Stuff for nerds }}
+    <div class="rcstatus-scrapable">
+        <h2>Stats for nerds</h2>
+        {{! Info }}
+        {{#if staticdata_ok}}
+            <p>Minimum Version: {{staticdata.MinimumVersion}}</p>
+            <p>Maintenance Mode? {{staticdata.MaintenanceMode}}</p>
+            <p>EAC Enabled? {{staticdata.EacEnabled}}</p>
+            <p>XSolla Enabled? {{staticdata.xsollaEnabled}}</p>
+            <p>Packet size (max): {{staticdata.PacketSize}} ({{staticdata.MaxPacketSize}})</p>
+        {{/if}}
+        {{#unless staticdata_ok}}
+            <p>Static data server is down :(</p>
+        {{/unless}}
+    </div>
+
+    {{! Incidents //TODO}}
+    <div>
+        <h2>Incidents</h2>
+        <table class="rcstatus-incident-table rcstatus-divider-t">
+            <tbody>
+            <tr>
+                <th width="50%" class="spaceless"></th>
+                <th width="50%" class="spaceless"></th>
+            </tr>
+            {{#each data.incidents}}
+                <tr class="rcstatus-divider-b">
+                    <td class="rcstatus-divider-r">
+                        {{#if message}} {{!-- Maintenance incident --}}
+                            <h3>Maintenance</h3>
+                        {{/if}}
+                        {{#unless message}}
+                            <h3>{{title}}</h3>
+                        {{/unless}}
+                        <div class="rcstatus-timespan">
+                            <p>
+                                <span class="rcstatus-incident-time"><time datetime="{{time}}" onload="populateTime(event)" onclick="populateTime(event)"></time></span>
+                            </p>
+                            {{#if resolved}}
+                                <p>to</p>
+                                <p>
+                                    <span class="rcstatus-incident-time"><time datetime="{{resolved}}" onload="populateTime(event)"></time></span>
+                                </p>
+                            {{/if}}
+                        </div>
+                    </td>
+                    <td class="rcstatus-incident-info">
+                        {{#if message}} {{!-- Maintenance incident --}}
+                            <p>{{message}}</p>
+                        {{/if}}
+                        {{#unless message}}
+                            <p>{{description}}</p>
+                        {{/unless}}
+                    </td>
+                </tr>
+            {{/each}}
+            </tbody>
+        </table>
+    </div>
+
+    {{! Attribution }}
+    <footer class="rcstatus-divider-b">
+        <div align="center">
+            <p>Developed by <a href="https://twitter.com/NGniusness">NGniusness</a></p>
+        </div>
+    </footer>
+</div>
+<div align="center" style="display:none;">
     <h1>Robocraft Server Status</h1>
     <p>Unofficial status detector for Robocraft servers</p>
     {{#if staticdata_ok}}
@@ -26,21 +182,11 @@
             <h2>Message from Freejam: {{staticdata.DevMessage}}</h2>
         {{/if}}
     {{/if}}
-    {{!--{{debug}}--}}
-    {{#if staticdata_ok}}
-        <div align="left">
-            <p>Minimum Version: {{staticdata.MinimumVersion}}</p>
-            <p>Maintenance Mode? {{staticdata.MaintenanceMode}}</p>
-            <p>EAC Enabled? {{staticdata.EacEnabled}}</p>
-            <p>XSolla Enabled? {{staticdata.xsollaEnabled}}</p>
-            <p>Packet size (max): {{staticdata.PacketSize}} ({{staticdata.MaxPacketSize}})</p>
-        </div>
-    {{/if}}
-    {{#unless staticdata_ok}}
-        <div align="left">
-            <p>Static data server is down :(</p>
-        </div>
-    {{/unless}}
+    {{! Ping latency graph }}
+    <div class="rcstatus-graph">
+        <canvas id="pingGraph" height="50px" class="rcstatus-graph"></canvas>
+    </div>
+    {{! Incidents }}
     <div>
         <h2>Incidents</h2>
         {{#each data.incidents}}
@@ -61,10 +207,5 @@
         {{/each}}
     </div>
 </div>
-<footer>
-    <div align="center">
-        <p>Developed by <a href="https://twitter.com/NGniusness">NGniusness</a> | <a href="https://github.com/NGnius">Code</a></p>
-    </div>
-</footer>
 </body>
 </html>

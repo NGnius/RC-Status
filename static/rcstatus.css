@@ -1,0 +1,94 @@
+.rcstatus-background {
+    background-color: #efece6;
+    margin: 0;
+}
+.rcstatus-main {
+    background-color: #1f1f1f;
+    margin: 0 auto;
+    width: 90%;
+    color: #ffffff;
+    font-family: 'Noto Sans', sans-serif;
+    padding: 12px 0;
+}
+.rcstatus-main a:link {
+    color: #c0ccff;text-decoration: none;
+}
+.rcstatus-main a:visited {
+    color: #c0cccc;text-decoration: none;
+}
+.rcstatus-main a:hover {
+    color: #a0aaff;text-decoration: none;
+}
+.rcstatus-main a:active {
+    color: #404444;text-decoration: none;
+}
+.rcstatus-main h1 {
+    font-size: xx-large;
+    color: #ffffff;
+    font-weight: bold;
+    text-align: center;
+}
+.rcstatus-main h2 {
+    font-size: x-large;
+    color: #ffffff;
+    font-weight: bold;
+    text-align: center;
+}
+.rcstatus-main h3 {
+    font-size: large;
+    color: #ffffff;
+    font-weight: bold;
+    text-align: center;
+}
+.spaceless{
+    padding: 0;
+    margin: 0;
+    border: 0;
+}
+.rcstatus-divider-t {
+    border-color: #3a8bce;
+    border-width: 2px 0 0 0;
+    border-style: solid;
+}
+.rcstatus-divider-r {
+    border-color: #3a8bce;
+    border-width: 0 2px 0 0;
+    border-style: solid;
+}
+.rcstatus-divider-b {
+    border-color: #3a8bce;
+    border-width: 0 0 2px 0;
+    border-style: solid;
+}
+.rcstatus-divider-l {
+    border-color: #3a8bce;
+    border-width: 0 0 0 2px;
+    border-style: solid;
+}
+.rcstatus-graph {
+    background-color: #efece6;
+    margin: none;
+    padding: 1%;
+}
+.rcstatus-scrapable {
+    display: none;
+}
+.rcstatus-incident-table {
+    margin: auto;
+    padding: 1%;
+    width: 80%;
+    border-collapse: collapse;
+}
+.rcstatus-timespan {
+    margin: auto 0;
+    text-align: center;
+    color: #a1a1a1;
+}
+.rcstatus-incident-time {
+    margin: auto;
+    text-align: center;
+}
+.rcstatus-incident-info {
+    text-align: left;
+    padding: 4%;
+}

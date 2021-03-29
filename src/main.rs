@@ -10,6 +10,8 @@ mod staticdata;
 mod persist;
 mod configuration;
 mod maintenance;
+mod ping;
+mod graphing;
 
 lazy_static! {
     pub static ref CONTEXT: RwLock<context::IndexContext> = RwLock::new(context::IndexContext::new());

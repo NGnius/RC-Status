@@ -36,6 +36,10 @@ impl PersistentData {
         }
         self.stats.push(d);
     }
+
+    pub fn datapoints(&self) -> &[DataPoint] {
+        &self.stats
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -98,8 +102,13 @@ impl Incident {
 }
 
 #[derive(Serialize, Deserialize, Clone)]
-#[serde(tag = "type")]
-pub enum DataPoint{}
+pub struct DataPoint{
+    #[serde(with = "ts_seconds")]
+    pub time: DateTime<Utc>,
+    pub max: f32,
+    pub min: f32,
+    pub avg: f32,
+}
 
 pub fn start_worker() -> JoinHandle<()> {
     if let Ok(json_file) = std::fs::File::open("data.json") {

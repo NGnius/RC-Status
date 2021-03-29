@@ -14,6 +14,8 @@ impl Workers {
         self.handles.push(crate::persist::start_worker());
         self.handles.push(crate::staticdata::start_worker());
         self.handles.push(crate::maintenance::start_worker());
+        self.handles.push(crate::ping::start_worker());
+        self.handles.push(crate::graphing::start_worker());
     }
 
     pub fn stop(self) {
