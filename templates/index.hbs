@@ -1,9 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>RoboStatus</title>
+    <title>RCStatus</title>
     <link rel="shortcut icon" href="/static/favicon.png">
     <link rel="icon" href="/static/favicon.png">
+    {{! Meta }}
+    <meta name="theme-color" content="#3a8bce">
+    <meta name="author" content="NGniusness">
+    <meta name="keywords" content="robocraft,status,ngnius,exmods">
+    <meta name="og:type" content="website">
+    <meta name="og:title" content="RC Status">
+    <meta name="og:description" content="Unofficial server status information for Robocraft. {{#if game_status.ok}}({{game_status.ping_i}} ms){{/if}}">
+    <meta name="description" content="Unofficial server status information for Robocraft.">
+    <meta name="og:image" content="/static/favicon.png">
+    <meta name="og:url" content="https://rcstat.us">
+    <meta charset="UTF-8">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="twitter:domain" content="rcstat.us">
+    <meta property="twitter:url" content="https://rcstat.us">
+    <meta name="twitter:title" content="RC Status">
+    <meta name="twitter:description" content="Unofficial server status information for Robocraft.">
+    <meta name="twitter:image" content="/static/favicon.png">
     {{! Scripts }}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js" integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw==" crossorigin="anonymous"></script>
     <script type="application/javascript">
