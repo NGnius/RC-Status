@@ -62,9 +62,8 @@
                     scales: {
                         yAxes: [{
                             ticks: {
-                                suggestedMax: 100,
-                                suggestedMin: 0,
-                                //beginAtZero: true,
+                                suggestedMax: 150,
+                                suggestedMin: 100,
                                 maxTicksLimit: 4,
                             }
                         }],
@@ -72,7 +71,6 @@
                     },
                     title:{text:'Server Latency (ms)',display:true},
                     legend:{display:false}
-                    //tooltips: {enabled: false}
                 }
             });
         }
@@ -90,7 +88,7 @@
         <div class="rcstatus-indicator" style="background-color:{{game_status.bg_color}};">
             <span class="rcstatus-indicator-circle" style="background-color: {{game_status.color}};"></span>
             <span class="rcstatus-indicator-text">{{game_status.text}}</span>
-            <span class="rcstatus-indicator-tooltip">{{game_status.ping}} ms</span>
+            <span class="rcstatus-indicator-tooltip">{{game_status.ping_i}} ms</span>
         </div>
     {{/if}}
     {{#if staticdata_ok}}
@@ -115,7 +113,7 @@
                 <div class="rcstatus-indicator" style="background-color:{{bg_color}};">
                     <span class="rcstatus-indicator-circle" style="background-color: {{color}};"></span>
                     <span class="rcstatus-indicator-text">{{name}}</span>
-                    <span class="rcstatus-indicator-tooltip">{{ping}} ms</span>
+                    <span class="rcstatus-indicator-tooltip">{{ping_i}} ms</span>
                 </div>
             {{/each}}
         </div>

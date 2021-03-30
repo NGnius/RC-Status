@@ -1,28 +1,42 @@
 use std::thread::{spawn, sleep, JoinHandle};
-
-use crate::ping::ping;
+use reqwest::blocking::ClientBuilder;
+use chrono::prelude::{Utc};
 
 const INDICATOR_NAME: &str = "Authentication";
 
 pub fn start_worker() -> JoinHandle<()> {
-    spawn(payment_worker)
+    spawn(auth_worker)
 }
 
-fn payment_worker() { // lol
+fn auth_worker() {
+    let mut sleep_dur = std::time::Duration::from_millis(crate::CONFIG.read().unwrap().period_ms);
+    let http_client = ClientBuilder::new()
+        .connect_timeout(sleep_dur)
+        .timeout(sleep_dur)
+        .build().expect("Failed to build auth worker HTTP client");
     while ! *crate::IS_STOPPING.read().unwrap() {
         let staticdata_ok = crate::CONTEXT.read().unwrap().staticdata_ok;
         if staticdata_ok {
             // to prevent long read lock, clone first then strip off port number
             let full_addr = crate::CONTEXT.read().unwrap().staticdata.authUrl.clone();
-            let addr = full_addr.split("/").collect::<Vec<&str>>()[2];
-            if let Ok(ping_time) = ping(addr) {
-                crate::CONTEXT.write().unwrap().indicators.update(INDICATOR_NAME, true, ping_time.avg);
+            //let addr = full_addr.split("/").collect::<Vec<&str>>()[2];
+            let req = http_client.get(&full_addr);
+            let start = Utc::now();
+            let result = req.send();
+            let duration = ((Utc::now() - start).num_microseconds().unwrap() as f32)/1000.0;
+            if let Ok(resp) = result {
+                if resp.status() == 404 || resp.status() == 200 {
+                    crate::CONTEXT.write().unwrap().indicators.update(INDICATOR_NAME, true, duration, true);
+                } else {
+                    crate::CONTEXT.write().unwrap().indicators.update_error(INDICATOR_NAME, true, true);
+                }
             } else {
-                crate::CONTEXT.write().unwrap().indicators.update_error(INDICATOR_NAME, true);
+                crate::CONTEXT.write().unwrap().indicators.update_error(INDICATOR_NAME, true, true);
             }
         }
         // no API spam
         let dur = crate::CONFIG.read().unwrap().period_ms;
-        sleep(std::time::Duration::from_millis(dur));
+        sleep_dur = std::time::Duration::from_millis(dur);
+        sleep(sleep_dur);
     }
 }

@@ -16,9 +16,9 @@ fn payment_worker() { // lol
             let full_addr = crate::CONTEXT.read().unwrap().staticdata.ErrorLogAddress.clone();
             let addr = full_addr.split(":").collect::<Vec<&str>>()[0];
             if let Ok(ping_time) = ping(addr) {
-                crate::CONTEXT.write().unwrap().indicators.update(INDICATOR_NAME, true, ping_time.avg);
+                crate::CONTEXT.write().unwrap().indicators.update(INDICATOR_NAME, true, ping_time.avg, false);
             } else {
-                crate::CONTEXT.write().unwrap().indicators.update_error(INDICATOR_NAME, true);
+                crate::CONTEXT.write().unwrap().indicators.update_error(INDICATOR_NAME, true, false);
             }
         }
         // no API spam
