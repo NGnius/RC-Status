@@ -6,6 +6,7 @@ use std::thread::{spawn, sleep, JoinHandle};
 pub struct Config {
     pub max_incidents: usize,
     pub max_datapoints: usize,
+    pub graph_ratio: usize,
     pub password: String,
     pub period_ms: u64,
     #[serde(skip_serializing, skip_deserializing)]
@@ -17,6 +18,7 @@ impl Config {
         Config{
             max_incidents: 0,
             max_datapoints: 0,
+            graph_ratio: 0,
             password: "".to_string(),
             period_ms: 0,
             valid: false,

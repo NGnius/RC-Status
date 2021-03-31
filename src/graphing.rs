@@ -63,6 +63,42 @@ impl GraphDataPoint {
             avg
         }
     }
+    
+    pub fn from_datapoints(datapoints: &Vec<crate::persist::DataPoint>) -> GraphDataPoint {
+        let mut max = GRAPH_MINIMUM_VALUE - 1.0;
+        let mut min = GRAPH_MAXIMUM_VALUE + 1.0;
+        let mut avg = 0.0;
+        for dp in datapoints {
+            if dp.max > max && !(dp.max < GRAPH_MINIMUM_VALUE) {
+                println!("New max {}", dp.max);
+                max = dp.max;
+            }
+            if dp.min < min && !(dp.min < GRAPH_MINIMUM_VALUE) {
+                println!("New min {}", dp.min);
+                min = dp.min;
+            }
+            if avg < GRAPH_MAXIMUM_VALUE {
+                if dp.avg > GRAPH_MAXIMUM_VALUE {
+                    avg = GRAPH_MAXIMUM_VALUE;
+                } else if dp.avg < GRAPH_MINIMUM_VALUE {
+                    avg = GRAPH_MAXIMUM_VALUE;
+                } else {
+                    avg += dp.avg / (datapoints.len() as f32);
+                }
+            }
+        }
+        if max > GRAPH_MAXIMUM_VALUE { max = GRAPH_MAXIMUM_VALUE; }
+        if max < GRAPH_MINIMUM_VALUE { max = GRAPH_MAXIMUM_VALUE; }
+        if min > GRAPH_MAXIMUM_VALUE { min = GRAPH_MAXIMUM_VALUE; }
+        if min < GRAPH_MINIMUM_VALUE { min = GRAPH_MAXIMUM_VALUE; }
+        GraphDataPoint {
+            ref_time: datapoints[datapoints.len()-1].time,
+            time: 0.0,
+            max,
+            min,
+            avg,
+        }
+    }
 }
 
 pub fn start_worker() -> JoinHandle<()> {
@@ -71,26 +107,26 @@ pub fn start_worker() -> JoinHandle<()> {
 }
 
 fn graph_worker() {
+    let mut graph_ratio = crate::CONFIG.read().unwrap().graph_ratio;
+    let mut point_buffer = std::vec::Vec::<crate::persist::DataPoint>::with_capacity(graph_ratio);
+    let mut last_time = crate::persist::time_now();
     while ! *crate::IS_STOPPING.read().unwrap() {
-        let mut update_required = false;
         {
             let ctx = crate::CONTEXT.read().unwrap();
             if ctx.data.datapoints().len() != 0 {
-                if ctx.graph.datapoints.len() != 0 {
-                    let dp = &ctx.data.datapoints()[ctx.data.datapoints().len()-1];
-                    if dp.time != ctx.graph.datapoints[ctx.graph.datapoints.len()-1].ref_time {
-                        update_required = true;
-                    }
-                } else {
-                    update_required = true;
+                let dp = &ctx.data.datapoints()[ctx.data.datapoints().len()-1];
+                if dp.time > last_time {
+                    point_buffer.push(dp.clone());
+                    last_time = dp.time.clone();
                 }
             }
+            graph_ratio = crate::CONFIG.read().unwrap().graph_ratio;
         }
-        if update_required {
+        if point_buffer.len() >= graph_ratio {
             let mut ctx = crate::CONTEXT.write().unwrap();
-            let dp = ctx.data.datapoints()[ctx.data.datapoints().len()-1].clone();
-            ctx.graph.push_stat(GraphDataPoint::from_datapoint(&dp), crate::CONFIG.read().unwrap().max_datapoints);
+            ctx.graph.push_stat(GraphDataPoint::from_datapoints(&point_buffer), crate::CONFIG.read().unwrap().max_datapoints);
             ctx.graph.update_timestamps();
+            point_buffer.clear();
         }
         // no CPU spam
         sleep(std::time::Duration::from_millis(crate::CONFIG.read().unwrap().period_ms / 2));
@@ -99,10 +135,16 @@ fn graph_worker() {
 
 fn populate_graph_points() {
     let mut ctx = crate::CONTEXT.write().unwrap();
+    let graph_ratio = crate::CONFIG.read().unwrap().graph_ratio;
+    let mut point_buffer = std::vec::Vec::<crate::persist::DataPoint>::with_capacity(graph_ratio);
     let max_datapoints = crate::CONFIG.read().unwrap().max_datapoints;
     for i in 0..ctx.data.datapoints().len() {
-        let dp = ctx.data.datapoints()[i].clone();
-        ctx.graph.push_stat(GraphDataPoint::from_datapoint(&dp), max_datapoints);
+        point_buffer.push(ctx.data.datapoints()[i].clone());
+        if point_buffer.len() >= graph_ratio {
+            ctx.graph.push_stat(GraphDataPoint::from_datapoints(&point_buffer), max_datapoints);
+            ctx.graph.update_timestamps();
+            point_buffer.clear();
+        }
     }
     ctx.graph.update_timestamps();
 }
