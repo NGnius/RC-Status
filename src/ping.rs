@@ -13,8 +13,9 @@ pub fn start_worker() -> JoinHandle<()> {
 fn ping_worker() {
     while ! *crate::IS_STOPPING.read().unwrap() {
         // run ping command to server
-        let staticdata_ok= crate::CONTEXT.read().unwrap().staticdata_ok.clone();
+        let staticdata_ok = crate::CONTEXT.read().unwrap().staticdata_ok.clone();
         if staticdata_ok {
+            let is_in_maintenance = crate::CONTEXT.read().unwrap().staticdata.MaintenanceMode;
             let full_addr = crate::CONTEXT.read().unwrap().staticdata.GameplayServerServiceAddress
                 .clone();
             let addr = full_addr.split(":").collect::<Vec<&str>>()[0];
@@ -36,6 +37,12 @@ fn ping_worker() {
                     max: -1.0,
                 });
                 crate::CONTEXT.write().unwrap().game_status.update(true, -1.0);
+            }
+            if is_in_maintenance {
+                let mut lock = crate::CONTEXT.write().unwrap();
+                lock.game_status.text = "Maintenance".to_owned();
+                lock.game_status.bg_color = "#aaaa11".to_owned();
+                lock.game_status.color = "#ffff00".to_owned();
             }
         }
         // no API spam
