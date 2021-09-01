@@ -23,7 +23,9 @@ fn cdn_worker() { // lol
             let full_addr = crate::CONTEXT.read().unwrap().staticdata.AvatarCdnUrl.clone();
             let addr = full_addr.split("/").collect::<Vec<&str>>()[0];
             if let Ok(ping_time) = ping(addr) {
-                let req = http_client.get(&full_addr);
+                let http_addr = "http://".to_owned() + addr;
+                println!("CDN HTTP URL {}", &http_addr);
+                let req = http_client.get(&http_addr);
                 let start = Utc::now();
                 let result = req.send();
                 let duration = ((Utc::now() - start).num_microseconds().unwrap() as f32)/1000.0;
