@@ -31,7 +31,13 @@ lazy_static! {
 fn main() {
     let mut workers = work::Workers::new();
     workers.start();
-    rocket::ignite().mount("/", routes![root::index, raw::static_json])
+    rocket::ignite().mount("/",
+        routes![
+            root::index,
+            raw::static_json,
+            raw::robots,
+            ]
+        )
         .mount("/static", rocket_contrib::serve::StaticFiles::from("./static"))
         .attach(rocket_contrib::templates::Template::fairing())
         .launch();

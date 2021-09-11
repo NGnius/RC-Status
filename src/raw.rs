@@ -14,3 +14,17 @@ pub fn static_json() -> Result<Json<crate::staticdata::StaticData>, Status> {
         return Err(Status::Conflict);
     }
 }
+
+#[get("/robots.txt")]
+pub fn robots() -> &'static str {
+"# Taking Robocraft literally, nice!
+
+User-agent: *
+Allow: /
+Disallow: /robocraftstaticdata
+Disallow: /static/
+
+# Get out of here with that grindy lookalike
+User-agent: Crossout
+Disallow: /"
+}
