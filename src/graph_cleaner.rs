@@ -16,10 +16,12 @@ fn cleaner_worker() {
             if graph_len > graph_points {
                 // remove every second graph point when too many exist
                 let mut ctx = crate::CONTEXT.write().unwrap();
+                let mut removed = 0;
                 for i in 0..graph_len {
                     if (i & 1) == 0 {
                         println!("Removing point {} (of {})", i, graph_len);
-                        ctx.graph.datapoints.remove(i);
+                        ctx.graph.datapoints.remove(i - removed);
+                        removed += 1;
                     }
                 }
             }
