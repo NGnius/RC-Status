@@ -24,7 +24,7 @@ fn cdn_worker() { // lol
             let addr = full_addr.split("/").collect::<Vec<&str>>()[0];
             if let Ok(ping_time) = ping(addr) {
                 let http_addr = "http://".to_owned() + addr;
-                println!("CDN HTTP URL {}", &http_addr);
+                //println!("CDN HTTP URL {}", &http_addr);
                 let req = http_client.get(&http_addr);
                 let start = Utc::now();
                 let result = req.send();

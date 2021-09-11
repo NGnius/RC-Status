@@ -12,6 +12,7 @@ pub fn start_worker() -> JoinHandle<()> {
 
 fn ping_worker() {
     while ! *crate::IS_STOPPING.read().unwrap() {
+        println!("Running game status worker");
         // run ping command to server
         let staticdata_ok = crate::CONTEXT.read().unwrap().staticdata_ok.clone();
         if staticdata_ok {
@@ -29,6 +30,7 @@ fn ping_worker() {
                     max: output.max,
                 });
                 crate::CONTEXT.write().unwrap().game_status.update(true, output.avg);
+                println!("Updated ping time successfully");
             } else {
                 crate::persist::collect(persist::DataPoint{
                     time: persist::time_now(),
@@ -37,12 +39,14 @@ fn ping_worker() {
                     max: -1.0,
                 });
                 crate::CONTEXT.write().unwrap().game_status.update(true, -1.0);
+                println!("Updated ping time unsuccessfully (bad ping result)");
             }
             if is_in_maintenance {
                 let mut lock = crate::CONTEXT.write().unwrap();
                 lock.game_status.text = "Maintenance".to_owned();
                 lock.game_status.bg_color = "#aaaa11".to_owned();
-                lock.game_status.color = "#ffff00".to_owned();
+                lock.game_status.color = "#ffff11".to_owned();
+                println!("Entered maintenance mode");
             }
         }
         // no API spam

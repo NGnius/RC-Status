@@ -198,6 +198,7 @@ fn staticdata_worker() {
         .timeout(sleep_dur)
         .build().expect("Failed to build static data worker HTTP client");
     while ! *crate::IS_STOPPING.read().unwrap() {
+        println!("Running static data worker");
         // do work
         let result = http_client.get(URL).send();
         if let Ok(resp) = result {
@@ -209,17 +210,20 @@ fn staticdata_worker() {
                 let mut ctx = crate::CONTEXT.write().unwrap();
                 ctx.staticdata_ok = true;
                 ctx.staticdata = nice_data;
+                println!("Updated static data successfully");
             } else {
                 // json is bad
                 let mut ctx = crate::CONTEXT.write().unwrap();
                 ctx.staticdata_ok = false;
                 //println!("Json err: {}", data_res.err().unwrap());
+                println!("Updated static data unsuccessfully (bad JSON)");
             }
         } else {
             // bad server response
             let mut ctx = crate::CONTEXT.write().unwrap();
             ctx.staticdata_ok = false;
             //println!("HTTP error: {}", result.err().unwrap());
+            println!("Updated static data unsuccessfully (bad response)");
         }
         // no API spam
         sleep_dur = std::time::Duration::from_millis(crate::CONFIG.read().unwrap().period_ms);
