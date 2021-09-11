@@ -3,5 +3,6 @@
   "max_datapoints": 1000,
   "password": "password",
   "period_ms": 60000,
-  "graph_ratio": 100
+  "graph_ratio": 10,
+  "max_graphpoints": 2000
 }

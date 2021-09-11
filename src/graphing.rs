@@ -129,7 +129,8 @@ fn graph_worker() {
             point_buffer.clear();
         }
         // no CPU spam
-        sleep(std::time::Duration::from_millis(crate::CONFIG.read().unwrap().period_ms / 2));
+        let dur = crate::CONFIG.read().unwrap().period_ms;
+        sleep(std::time::Duration::from_millis(dur / 2));
     }
 }
 

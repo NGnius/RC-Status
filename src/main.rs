@@ -19,6 +19,8 @@ mod leaderboard_status;
 mod logs_status;
 mod auth_status;
 mod cdn_status;
+mod graph_cleaner;
+mod raw;
 
 lazy_static! {
     pub static ref CONTEXT: RwLock<context::IndexContext> = RwLock::new(context::IndexContext::new());
@@ -29,7 +31,7 @@ lazy_static! {
 fn main() {
     let mut workers = work::Workers::new();
     workers.start();
-    rocket::ignite().mount("/", routes![root::index])
+    rocket::ignite().mount("/", routes![root::index, raw::static_json])
         .mount("/static", rocket_contrib::serve::StaticFiles::from("./static"))
         .attach(rocket_contrib::templates::Template::fairing())
         .launch();

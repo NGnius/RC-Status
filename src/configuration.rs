@@ -9,18 +9,20 @@ pub struct Config {
     pub graph_ratio: usize,
     pub password: String,
     pub period_ms: u64,
+    pub max_graphpoints: usize,
     #[serde(skip_serializing, skip_deserializing)]
     pub valid: bool,
 }
 
 impl Config {
-    pub fn new() -> Config {
-        Config{
+    pub fn new() -> Self {
+        Self {
             max_incidents: 0,
             max_datapoints: 0,
             graph_ratio: 0,
             password: "".to_string(),
             period_ms: 0,
+            max_graphpoints: 0,
             valid: false,
         }
     }

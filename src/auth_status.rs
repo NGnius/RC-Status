@@ -26,17 +26,20 @@ fn auth_worker() {
             let duration = ((Utc::now() - start).num_microseconds().unwrap() as f32)/1000.0;
             if let Ok(resp) = result {
                 if resp.status() == 404 || resp.status() == 200 {
+                    println!("Updated authentication status successfully");
                     crate::CONTEXT.write().unwrap().indicators.update(INDICATOR_NAME, true, duration, true);
                 } else {
+                    println!("Updated authentication status unsuccessfully (bad status {})", resp.status());
                     crate::CONTEXT.write().unwrap().indicators.update_error(INDICATOR_NAME, true, true);
                 }
             } else {
+                println!("Updated authentication status unsuccessfully (bad request {})", result.err().unwrap());
                 crate::CONTEXT.write().unwrap().indicators.update_error(INDICATOR_NAME, true, true);
             }
         }
         // no API spam
         let dur = crate::CONFIG.read().unwrap().period_ms;
-        sleep_dur = std::time::Duration::from_millis(dur);
+        sleep_dur = std::time::Duration::from_millis(dur * 2);
         sleep(sleep_dur);
     }
 }

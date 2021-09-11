@@ -22,6 +22,7 @@ impl Workers {
         self.handles.push(crate::auth_status::start_worker());
         self.handles.push(crate::logs_status::start_worker());
         self.handles.push(crate::cdn_status::start_worker());
+        self.handles.push(crate::graph_cleaner::start_worker());
     }
 
     pub fn stop(self) {
