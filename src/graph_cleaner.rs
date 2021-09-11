@@ -19,8 +19,14 @@ fn cleaner_worker() {
                 let mut removed = 0;
                 for i in 0..graph_len {
                     if (i & 1) == 0 {
+                        let corrected_index = i - removed;
                         println!("Removing point {} (of {})", i, graph_len);
-                        ctx.graph.datapoints.remove(i - removed);
+                        let removed_point = ctx.graph.datapoints.remove(corrected_index);
+                        if (corrected_index) < ctx.graph.datapoints.len() {
+                            ctx.graph.datapoints[corrected_index].merge(removed_point);
+                        } else if (corrected_index - 1) < ctx.graph.datapoints.len() {
+                            ctx.graph.datapoints[corrected_index - 1].merge(removed_point);
+                        }
                         removed += 1;
                     }
                 }

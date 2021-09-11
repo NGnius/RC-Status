@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::thread::{spawn, sleep, JoinHandle};
-use chrono::prelude::{Utc, DateTime};
+use chrono::prelude::{Utc, DateTime, NaiveDateTime};
 use chrono::serde::ts_seconds;
 
 pub const GRAPH_MINIMUM_VALUE: f32 = 0.0; // ms
@@ -98,6 +98,18 @@ impl GraphDataPoint {
             min,
             avg,
         }
+    }
+
+    pub fn merge(&mut self, other: Self) {
+        self.ref_time = DateTime::from_utc(
+            NaiveDateTime::from_timestamp(
+                (self.ref_time.timestamp() / 2) + (self.ref_time.timestamp() / 2), 0
+            ), Utc
+        );
+        self.time = (self.time + other.time) / 2.0;
+        self.max = if self.max > other.max {self.max} else {other.max};
+        self.min = if self.min < other.min {self.min} else {other.min};
+        self.avg = (self.avg + other.avg) / 2.0;
     }
 }
 
