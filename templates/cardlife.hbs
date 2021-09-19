@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>CLStatus</title>
+    <link rel="shortcut icon" href="/static/favicon.png">
+    <link rel="icon" href="/static/favicon.png">
+    {{! Meta }}
+    <meta name="theme-color" content="#3a8bce">
+    <meta name="author" content="NGniusness">
+    <meta name="keywords" content="robocraft,status,ngnius,exmods">
+    <meta name="og:type" content="website">
+    <meta name="og:title" content="CL Info">
+    <meta name="og:description" content="Unofficial server information for Cardlife.">
+    <meta name="description" content="Unofficial server information for Cardlife.">
+    <meta name="og:image" content="/static/favicon.png">
+    <meta name="og:url" content="https://rcstat.us">
+    <meta charset="UTF-8">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="twitter:domain" content="rcstat.us">
+    <meta property="twitter:url" content="https://rcstat.us">
+    <meta name="twitter:title" content="CL Info">
+    <meta name="twitter:description" content="Unofficial server status information for Cardlife.">
+    <meta name="twitter:image" content="/static/favicon.png">
+    {{! Scripts }}
+    <script type="application/javascript">
+        function onLoadTasks(event) {
+        }
+    </script>
+    {{! Styles }}
+    <link rel="stylesheet" href="/static/rcstatus.css">
+</head>
+<body onload="onLoadTasks(event)" class="rcstatus-background">
+<div class="rcstatus-main rcstatus-divider-t" align="center">
+    <h1>Cardlife Info</h1>
+    <div class="spaceless rcstatus-divider-t" style="width:80%;"></div>
+    <h3 style="display:inline-block;">Unofficial info for Cardlife servers</h3>
+    {{! Main game service status }}
+
+    {{! Service latency info }}
+    <div>
+        <h2>Services</h2>
+        <div class="spaceless rcstatus-divider-t" style="width:80%;"></div>
+        <div class="rcstatus-indicator-container">
+            {{#each indicators.services}}
+                <div class="rcstatus-indicator" style="background-color:{{bg_color}};">
+                    <span class="rcstatus-indicator-circle" style="background-color: {{color}};"></span>
+                    <span class="rcstatus-indicator-text">{{name}}</span>
+                    <span class="rcstatus-indicator-tooltip">{{ping_i}} ms</span>
+                </div>
+            {{/each}}
+        </div>
+    </div>
+    
+    {{! Lobby info }}
+    <div>
+        <h2>Games</h2>
+        <table class="rcstatus-incident-table rcstatus-divider-t">
+            <tbody>
+            <tr>
+                <th width="50%" class="spaceless"></th>
+                <th width="50%" class="spaceless"></th>
+            </tr>
+            {{#each server_list}}
+                <tr class="rcstatus-divider-b">
+                    <td class="rcstatus-divider-r">
+                        <h3 alt="{{id}}">{{name}}</h3>
+                        <div class="rcstatus-timespan">
+                            <p>
+                                <span class="rcstatus-incident-time">{{ping}} ms</span>
+                            </p>
+                        </div>
+                    </td>
+                    <td class="rcstatus-incident-info">
+                        <p>Players: {{current_players}}/{{max_players}}</p>
+                        <p>Region: {{region}}</p>
+                        {{#if official}}
+                            <p>Official Server</p>
+                        {{/if}}
+                        {{#if pvp}}
+                            <p>PVP</p>
+                        {{/if}}
+                        {{#unless pvp}}
+                            <p>PVE</p>
+                        {{/unless}}
+                        {{#unless no_mods}}
+                            <p>Mods: {{mods}}</p>
+                        {{/unless}}
+                        {{#if password_protected}}
+                            <p>Password Required</p>
+                        {{/if}}
+                    </td>
+                </tr>
+            {{/each}}
+            </tbody>
+        </table>
+    </div>
+
+    {{! Attribution }}
+    <footer class="rcstatus-divider-b">
+        <div align="center">
+            <p>Developed by <a href="https://twitter.com/NGniusness">NGniusness</a></p>
+        </div>
+    </footer>
+</div>
+</body>
+</html>

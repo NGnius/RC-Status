@@ -21,6 +21,7 @@ mod auth_status;
 mod cdn_status;
 mod graph_cleaner;
 mod raw;
+mod cardlife;
 
 lazy_static! {
     pub static ref CONTEXT: RwLock<context::IndexContext> = RwLock::new(context::IndexContext::new());
@@ -36,6 +37,7 @@ fn main() {
             root::index,
             raw::static_json,
             raw::robots,
+            cardlife::cardlife,
             ]
         )
         .mount("/static", rocket_contrib::serve::StaticFiles::from("./static"))

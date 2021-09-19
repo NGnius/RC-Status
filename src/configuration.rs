@@ -10,6 +10,8 @@ pub struct Config {
     pub password: String,
     pub period_ms: u64,
     pub max_graphpoints: usize,
+    pub cardlife_email: String,
+    pub cardlife_password: String,
     #[serde(skip_serializing, skip_deserializing)]
     pub valid: bool,
 }
@@ -23,6 +25,8 @@ impl Config {
             password: "".to_string(),
             period_ms: 0,
             max_graphpoints: 0,
+            cardlife_email: "".to_string(),
+            cardlife_password: "".to_string(),
             valid: false,
         }
     }

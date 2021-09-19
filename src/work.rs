@@ -23,6 +23,7 @@ impl Workers {
         self.handles.push(crate::logs_status::start_worker());
         self.handles.push(crate::cdn_status::start_worker());
         self.handles.push(crate::graph_cleaner::start_worker());
+        crate::cardlife::start_cardlife_workers(&mut self.handles);
     }
 
     pub fn stop(self) {

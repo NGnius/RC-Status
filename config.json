@@ -4,5 +4,7 @@
   "password": "password",
   "period_ms": 1000,
   "graph_ratio": 10,
-  "max_graphpoints": 500
+  "max_graphpoints": 500,
+  "cardlife_email": "",
+  "cardlife_password": ""
 }
