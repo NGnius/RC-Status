@@ -8,7 +8,8 @@ pub fn start_worker() -> JoinHandle<()> {
 }
 
 fn maintenance_worker() {
-    let mut old_sd: Option<crate::staticdata::StaticData> = None;
+    return;
+    /*let mut old_sd: Option<crate::staticdata::StaticData> = None;
     while ! *crate::IS_STOPPING.read().unwrap() {
         // TODO check if maintenance is starting/stopping
         { // CONTEXT read lock scope (to not lock during sleep)
@@ -47,5 +48,5 @@ fn maintenance_worker() {
         }
         // no API spam
         sleep(std::time::Duration::from_millis(crate::CONFIG.read().unwrap().period_ms));
-    }
+    }*/
 }
