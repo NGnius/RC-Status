@@ -11,6 +11,9 @@ pub fn start_worker() -> JoinHandle<()> {
 }
 
 fn ping_worker() {
+    let mut old_high_ping = false;
+    let mut new_high_ping = false;
+    let mut last_avg_latency = 0.0;
     while ! *crate::IS_STOPPING.read().unwrap() {
         println!("Running game status worker");
         // run ping command to server
@@ -23,13 +26,37 @@ fn ping_worker() {
             // run ping command to get server ping time
             let ping_result = ping(addr);
             if let Ok(output) = ping_result {
-                crate::persist::collect(persist::DataPoint{
-                    time: persist::time_now(),
-                    min: output.min,
-                    avg: output.avg,
-                    max: output.max,
-                });
+                last_avg_latency = output.avg;
+                let datapoint = if output.avg > crate::graphing::GRAPH_MAXIMUM_VALUE
+                    || output.avg < crate::graphing::GRAPH_MINIMUM_VALUE {
+                    // make all ping times share the same invalid time
+                    persist::DataPoint {
+                        time: persist::time_now(),
+                        min: output.avg,
+                        avg: output.avg,
+                        max: output.avg,
+                    }
+                } else {
+                    persist::DataPoint {
+                        time: persist::time_now(),
+                        min: output.min,
+                        avg: output.avg,
+                        max: output.max,
+                    }
+                };
+                crate::persist::collect(datapoint);
                 crate::CONTEXT.write().unwrap().game_status.update(true, output.avg);
+                if output.avg > crate::graphing::GRAPH_MAXIMUM_VALUE
+                    || output.avg < crate::graphing::GRAPH_MINIMUM_VALUE
+                    || output.max > crate::graphing::GRAPH_MAXIMUM_VALUE
+                    || output.max < crate::graphing::GRAPH_MINIMUM_VALUE
+                    || output.min > crate::graphing::GRAPH_MAXIMUM_VALUE
+                    || output.min < crate::graphing::GRAPH_MINIMUM_VALUE {
+                    new_high_ping = true;
+                } else {
+                    new_high_ping = false;
+                }
+
                 println!("Updated ping time successfully");
             } else {
                 crate::persist::collect(persist::DataPoint{
@@ -49,6 +76,21 @@ fn ping_worker() {
                 println!("Entered maintenance mode");
             }
         }
+        if new_high_ping && !old_high_ping {
+            // ping has just become high
+            persist::report(persist::Incident::HighLatency {
+                time: persist::time_now(),
+                resolved: persist::epoch(),
+                title: "High Latency".to_owned(),
+                description: format!("Primary game server is very slow or unreachable. Last ping took {}ms.", last_avg_latency),
+            })
+        }
+
+        if old_high_ping && !new_high_ping {
+            // ping has just returned to normal
+            persist::resolve(8, persist::time_now());
+        }
+        old_high_ping = new_high_ping;
         // no API spam
         let dur = crate::CONFIG.read().unwrap().period_ms;
         sleep(std::time::Duration::from_millis(dur));

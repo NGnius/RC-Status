@@ -67,6 +67,14 @@ pub enum Incident {
         resolved: DateTime<Utc>,
         title: String,
         description: String,
+    },
+    HighLatency {
+        #[serde(with = "ts_seconds")]
+        time: DateTime<Utc>,
+        #[serde(with = "ts_seconds")]
+        resolved: DateTime<Utc>,
+        title: String,
+        description: String,
     }
 }
 
@@ -77,6 +85,7 @@ impl Incident {
              Incident::Custom { resolved, .. } => *resolved = endtime,
              Incident::Maintenance { resolved, .. } => *resolved = endtime,
              Incident::MiscOutage { resolved, .. } => *resolved = endtime,
+             Incident::HighLatency { resolved, .. } => *resolved = endtime,
          }
     }
 
@@ -89,6 +98,7 @@ impl Incident {
             Incident::Custom { resolved, .. } => resolved,
             Incident::Maintenance { resolved, .. } => resolved,
             Incident::MiscOutage { resolved, .. } => resolved,
+            Incident::HighLatency { resolved, .. } => resolved,
         }
     }
 
@@ -97,6 +107,7 @@ impl Incident {
             Incident::Custom { .. } => 1,
             Incident::Maintenance { .. } => 2,
             Incident::MiscOutage { .. } => 4,
+            Incident::HighLatency { .. } => 8,
         }
     }
 }
