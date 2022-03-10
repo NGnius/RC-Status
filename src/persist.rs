@@ -28,6 +28,7 @@ impl PersistentData {
             self.incidents.remove(0);
         }
         self.incidents.push(i);
+        self.incidents.sort_by(|a, b| b.relevant_time().cmp(a.relevant_time()));
     }
 
     pub fn push_stat(&mut self, d: DataPoint, max: usize) {
@@ -110,6 +111,20 @@ impl Incident {
             Incident::HighLatency { .. } => 8,
         }
     }
+
+    pub fn relevant_time(&self) -> &DateTime<Utc> {
+        if self.is_resolved() {
+            self.resolved()
+        } else {
+            match self {
+                Incident::Custom { time, .. } => time,
+                Incident::Maintenance { time, .. } => time,
+                Incident::MiscOutage { time, .. } => time,
+                Incident::HighLatency { time, .. } => time,
+            }
+        }
+
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -124,8 +139,9 @@ pub struct DataPoint{
 pub fn start_worker() -> JoinHandle<()> {
     if let Ok(json_file) = std::fs::File::open("data.json") {
         // populate persistent data, if exists
-        let data = serde_json::from_reader(std::io::BufReader::new(json_file))
+        let mut data: PersistentData = serde_json::from_reader(std::io::BufReader::new(json_file))
             .expect("Failed to parse data.json");
+        data.incidents.sort_by(|a, b| b.relevant_time().cmp(a.relevant_time()));
         crate::CONTEXT.write().unwrap().data = data;
     }
     {
